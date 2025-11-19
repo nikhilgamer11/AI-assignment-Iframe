@@ -1,83 +1,252 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AI Assessment Upload Demo</title>
-    <style>
-      body {
-        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-        background: #f9fafb;
-        color: #111827;
-        padding: 40px;
-        text-align: center;
-      }
-      .box {
-        background: #fff;
-        max-width: 500px;
-        margin: 0 auto;
-        padding: 40px;
-        border-radius: 12px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-      }
-      input[type="file"] {
-        display: none;
-      }
-      label {
-        background: #2563eb;
-        color: white;
-        padding: 10px 20px;
-        border-radius: 6px;
-        cursor: pointer;
-      }
-      .progress {
-        width: 100%;
-        height: 10px;
-        background: #e5e7eb;
-        border-radius: 5px;
-        margin-top: 15px;
-      }
-      .bar {
-        height: 10px;
-        width: 0%;
-        background: #22c55e;
-        border-radius: 5px;
-        transition: width 1.5s ease;
-      }
-      #result {
-        margin-top: 25px;
-        display: none;
-        background: #dcfce7;
-        padding: 10px;
-        border-radius: 6px;
-        color: #166534;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="box">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>AI-Assisted Assignment Upload (Interactive)</title>
+  <style>
+    :root{
+      --bg:#f6f7fb;--card:#ffffff;--ink:#0f172a;--muted:#64748b;
+      --brand:#1b69d2;--brand2:#2563eb;--ok:#22c55e;--warn:#f59e0b;--err:#ef4444;
+      --line:#e5e7eb;--chip:#eef2ff
+    }
+    *{box-sizing:border-box}
+    body{margin:0;background:var(--bg);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:var(--ink)}
+    .wrap{max-width:940px;margin:48px auto;padding:0 20px}
+    .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:28px;box-shadow:0 10px 30px rgba(2,6,23,.05)}
+    h1{margin:0 0 6px;font-size:28px}
+    .sub{color:var(--muted);margin:0 0 22px}
+    .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px}
+    @media(max-width:880px){.grid{grid-template-columns:1fr}}
+    .drop{border:2px dashed #cbd5e1;border-radius:14px;background:#fcfcff;padding:22px;text-align:center;transition:.2s}
+    .drop.drag{background:#f0f6ff;border-color:var(--brand)}
+    .btn{display:inline-flex;align-items:center;gap:8px;padding:10px 14px;border-radius:999px;border:0;cursor:pointer;font-weight:600}
+    .btn.primary{background:var(--brand);color:#fff}
+    .btn.ghost{background:#fff;border:1px solid var(--line);color:var(--ink)}
+    .btn.ok{background:var(--ok);color:#063b1d}
+    .btn:disabled{opacity:.55;cursor:not-allowed}
+    .meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+    .chip{background:var(--chip);color:#3730a3;border:1px solid #e0e7ff;padding:4px 10px;border-radius:999px;font-size:12px}
+    .row{margin:12px 0}
+    .bar{height:10px;background:#e5e7eb;border-radius:6px;overflow:hidden}
+    .fill{height:100%;width:0;background:linear-gradient(90deg,var(--brand),#7c3aed);transition:width .35s}
+    .kvs{display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:14px;margin-top:10px}
+    .kv{background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:8px 10px}
+    .kv b{display:block;font-size:12px;color:var(--muted);margin-bottom:2px}
+    .note{font-size:13px;color:var(--muted)}
+    .status{margin-top:10px;padding:8px 12px;border-radius:10px;background:#ecfeff;border:1px solid #bae6fd;color:#075985;font-size:14px;display:none}
+    .status.ok{background:#ecfdf5;border-color:#a7f3d0;color:#065f46}
+    .timeline{list-style:none;padding:0;margin:12px 0 0}
+    .timeline li{display:flex;gap:10px;align-items:center;margin:6px 0;color:var(--muted)}
+    .dot{width:10px;height:10px;border-radius:50%;background:#cbd5e1}
+    .done .dot{background:var(--ok)}
+    .done{color:#065f46}
+    .warn{color:#92400e}
+    .center{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:14px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
       <h1>AI-Assisted Assignment Upload</h1>
-      <p>Upload your Word or Excel assignment file for AI review.</p>
+      <p class="sub">Upload your Word/Excel/PDF. We’ll simulate AI checks, then you can mark the activity as complete.</p>
 
-      <label for="fileUpload">📎 Choose File</label>
-      <input type="file" id="fileUpload" accept=".doc,.docx,.xls,.xlsx,.pdf" />
+      <div class="grid">
+        <!-- LEFT: Upload + progress -->
+        <div>
+          <div id="drop" class="drop">
+            <p style="margin:0 0 12px">Drag & drop your file here</p>
+            <button class="btn ghost" id="pickBtn">📎 Choose File</button>
+            <input type="file" id="file" accept=".doc,.docx,.xls,.xlsx,.pdf" hidden />
+            <div class="meta" id="chips"></div>
+          </div>
 
-      <div class="progress"><div class="bar" id="progressBar"></div></div>
-      <div id="result">✅ Submission received! Awaiting marking...</div>
+          <div class="row">
+            <div class="bar"><div class="fill" id="fill"></div></div>
+            <div class="note" id="progressLabel">Waiting for file…</div>
+          </div>
+
+          <ul class="timeline" id="timeline">
+            <li><span class="dot"></span><span>Upload received</span></li>
+            <li><span class="dot"></span><span>Running word-count & integrity checks</span></li>
+            <li><span class="dot"></span><span>AI originality estimate</span></li>
+            <li><span class="dot"></span><span>Queued to marker</span></li>
+          </ul>
+
+          <div class="center">
+            <button class="btn primary" id="submitBtn" disabled>Submit to Assessment</button>
+            <button class="btn ok" id="completeBtn" disabled>Mark as Complete</button>
+            <button class="btn ghost" id="resetBtn">Try again</button>
+          </div>
+
+          <div id="status" class="status">Status</div>
+        </div>
+
+        <!-- RIGHT: Details -->
+        <div>
+          <div class="kvs" id="details">
+            <div class="kv"><b>File name</b><span id="kName">—</span></div>
+            <div class="kv"><b>Size</b><span id="kSize">—</span></div>
+            <div class="kv"><b>Word count (est.)</b><span id="kWords">—</span></div>
+            <div class="kv"><b>AI usage (sim.)</b><span id="kAI">—</span></div>
+          </div>
+          <p class="note" style="margin-top:10px">
+            This is a front-end demo. In production the upload would hit your assessment API (e.g., Azure),
+            and the result would be pushed back to LearnUpon. “Mark as Complete” below sends a safe signal
+            to the parent LMS and tries SCORM completion if available.
+          </p>
+        </div>
+      </div>
     </div>
+  </div>
 
-    <script>
-      const fileInput = document.getElementById('fileUpload');
-      const bar = document.getElementById('progressBar');
-      const result = document.getElementById('result');
+  <script>
+    // DOM
+    const file = document.getElementById('file');
+    const pickBtn = document.getElementById('pickBtn');
+    const drop = document.getElementById('drop');
+    const fill = document.getElementById('fill');
+    const progressLabel = document.getElementById('progressLabel');
+    const timeline = document.getElementById('timeline').children;
+    const submitBtn = document.getElementById('submitBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const completeBtn = document.getElementById('completeBtn');
+    const statusBox = document.getElementById('status');
+    const chips = document.getElementById('chips');
+    // Details
+    const kName = document.getElementById('kName');
+    const kSize = document.getElementById('kSize');
+    const kWords = document.getElementById('kWords');
+    const kAI = document.getElementById('kAI');
 
-      fileInput.addEventListener('change', () => {
-        bar.style.width = '0%';
-        result.style.display = 'none';
-        setTimeout(() => (bar.style.width = '80%'), 200);
-        setTimeout(() => (bar.style.width = '100%'), 2000);
-        setTimeout(() => (result.style.display = 'block'), 2500);
-      });
-    </script>
-  </body>
+    let chosen = null;
+    let submitted = false;
+
+    function setFill(p, label){
+      fill.style.width = p + '%';
+      if (label) progressLabel.textContent = label;
+    }
+    function clearTimeline(){
+      [...timeline].forEach(li => li.classList.remove('done'));
+    }
+    function tick(i){ timeline[i]?.classList.add('done'); }
+
+    // drag events
+    ['dragenter','dragover'].forEach(ev=>{
+      drop.addEventListener(ev, e=>{e.preventDefault(); drop.classList.add('drag');});
+    });
+    ['dragleave','drop'].forEach(ev=>{
+      drop.addEventListener(ev, e=>{e.preventDefault(); drop.classList.remove('drag');});
+    });
+    drop.addEventListener('drop', e=>{
+      const f = e.dataTransfer.files?.[0];
+      if (f) handleFile(f);
+    });
+
+    pickBtn.addEventListener('click', ()=>file.click());
+    file.addEventListener('change', ()=>{
+      if (file.files.length) handleFile(file.files[0]);
+    });
+
+    function handleFile(f){
+      chosen = f;
+      submitted = false;
+      chips.innerHTML = '';
+      statusBox.style.display = 'none';
+      setFill(10,'File selected');
+      clearTimeline();
+      tick(0);
+
+      // details
+      kName.textContent = f.name;
+      kSize.textContent = (f.size/1024/1024).toFixed(2)+' MB';
+      const words = 2800 + Math.floor(Math.random()*2400);
+      const ai = (Math.random()*18).toFixed(1);
+      kWords.textContent = words.toLocaleString();
+      kAI.textContent = ai + '%';
+
+      // chips
+      const makeChip = txt => {
+        const s = document.createElement('span'); s.className='chip'; s.textContent=txt; return s;
+      };
+      chips.appendChild(makeChip(f.name.split('.').pop().toUpperCase()));
+      chips.appendChild(makeChip(words<3000?'Below range':words>5000?'Above range':'Within range'));
+      chips.appendChild(makeChip(ai>15?'AI high':'AI OK'));
+
+      submitBtn.disabled = false;
+      completeBtn.disabled = true;
+    }
+
+    submitBtn.addEventListener('click', ()=>{
+      if (!chosen || submitted) return;
+      submitted = true;
+      submitBtn.disabled = true;
+      setFill(30,'Uploading to assessment platform…');
+
+      setTimeout(()=>{ setFill(55,'Running checks (word count, integrity)…'); tick(1);}, 800);
+      setTimeout(()=>{ setFill(75,'Estimating AI originality…'); tick(2);}, 1600);
+      setTimeout(()=>{ setFill(90,'Queued to marker…'); tick(3);}, 2300);
+      setTimeout(()=>{
+        setFill(100,'Submission received. You can now mark this activity as complete.');
+        statusBox.textContent = '✅ Submission received! Awaiting marking.';
+        statusBox.className = 'status ok';
+        statusBox.style.display = 'block';
+        completeBtn.disabled = false;
+      }, 3000);
+    });
+
+    resetBtn.addEventListener('click', ()=>{
+      chosen = null; submitted = false; file.value='';
+      chips.innerHTML=''; setFill(0,'Waiting for file…'); clearTimeline();
+      kName.textContent=kSize.textContent=kWords.textContent=kAI.textContent='—';
+      submitBtn.disabled=true; completeBtn.disabled=true; statusBox.style.display='none';
+    });
+
+    // ---- Completion signalling ----
+    function trySCORMComplete(){
+      // SCORM 1.2 style
+      try{
+        const API = window.API || (window.parent && window.parent.API) || (window.top && window.top.API);
+        if (API && API.LMSInitialize) {
+          try { API.LMSInitialize(""); } catch(e){}
+          try { API.LMSSetValue("cmi.core.lesson_status","completed"); } catch(e){}
+          try { API.LMSCommit(""); } catch(e){}
+          try { API.LMSFinish(""); } catch(e){}
+          return true;
+        }
+      }catch(e){}
+      // SCORM 2004 style
+      try{
+        const API2004 = window.API_1484_11 || (window.parent && window.parent.API_1484_11) || (window.top && window.top.API_1484_11);
+        if (API2004 && API2004.Initialize) {
+          try { API2004.Initialize(""); } catch(e){}
+          try { API2004.SetValue("cmi.completion_status","completed"); } catch(e){}
+          try { API2004.Commit(""); } catch(e){}
+          try { API2004.Terminate(""); } catch(e){}
+          return true;
+        }
+      }catch(e){}
+      return false;
+    }
+
+    function postParentCompleted(){
+      try {
+        window.parent && window.parent.postMessage({event:"assessment:completed"}, "*");
+      } catch(e){}
+    }
+
+    completeBtn.addEventListener('click', ()=>{
+      // send messages both ways (best-effort)
+      const scorm = trySCORMComplete();
+      postParentCompleted();
+
+      statusBox.textContent = scorm
+        ? '🎓 Marked complete via SCORM and postMessage.'
+        : '🎓 Marked complete (postMessage sent to parent).';
+      statusBox.className = 'status ok';
+      statusBox.style.display = 'block';
+      completeBtn.disabled = true;
+    });
+  </script>
+</body>
 </html>
