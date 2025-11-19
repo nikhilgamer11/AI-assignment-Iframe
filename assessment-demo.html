@@ -1,568 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <title>Assessment Submission Portal (Demo)</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    :root {
-      --bg: #020617;
-      --card: #020817;
-      --border: #1f2937;
-      --accent: #38bdf8;
-      --accent-soft: rgba(56, 189, 248, 0.15);
-      --text-main: #e5e7eb;
-      --text-muted: #9ca3af;
-      --danger: #f97373;
-      --warning: #facc15;
-      --success: #4ade80;
-    }
-
-    * {
-      box-sizing: border-box;
-    }
-
-    body {
-      margin: 0;
-      padding: 24px;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
-        sans-serif;
-      background: radial-gradient(circle at top, #0b1120 0, #020617 45%, #020617 100%);
-      color: var(--text-main);
-    }
-
-    .shell {
-      max-width: 920px;
-      margin: 0 auto;
-      background: rgba(15, 23, 42, 0.92);
-      border-radius: 18px;
-      border: 1px solid var(--border);
-      box-shadow: 0 24px 80px rgba(0, 0, 0, 0.65);
-      padding: 24px 24px 28px;
-    }
-
-    header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-
-    .brand-logo {
-      width: 32px;
-      height: 32px;
-      border-radius: 12px;
-      background: linear-gradient(135deg, var(--accent), #a855f7);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 700;
-      font-size: 0.9rem;
-      color: #0b1120;
-    }
-
-    .brand-text-title {
-      font-weight: 600;
-      font-size: 1rem;
-    }
-
-    .brand-text-sub {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-    }
-
-    .pill {
-      font-size: 0.78rem;
-      border-radius: 999px;
-      padding: 4px 10px;
-      border: 1px solid var(--border);
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text-muted);
-    }
-
-    h1 {
-      font-size: 1.35rem;
-      margin: 0 0 4px;
-    }
-
-    .subtitle {
-      font-size: 0.9rem;
-      color: var(--text-muted);
-      margin-bottom: 18px;
-    }
-
-    .grid {
-      display: grid;
-      grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-      gap: 18px;
-    }
-
-    .card {
-      background: var(--card);
-      border-radius: 14px;
-      border: 1px solid var(--border);
-      padding: 14px 16px 16px;
-    }
-
-    .card h2 {
-      margin: 0 0 8px;
-      font-size: 1rem;
-    }
-
-    .label {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: var(--text-muted);
-      margin-bottom: 4px;
-    }
-
-    .field-row {
-      margin-top: 10px;
-    }
-
-    input[type="text"],
-    input[type="number"] {
-      width: 100%;
-      padding: 7px 9px;
-      border-radius: 8px;
-      border: 1px solid #111827;
-      background: #020617;
-      color: var(--text-main);
-      font-size: 0.88rem;
-    }
-
-    input[readonly] {
-      opacity: 0.85;
-    }
-
-    input[type="file"] {
-      width: 100%;
-      padding: 7px 0;
-      color: var(--text-main);
-      font-size: 0.86rem;
-    }
-
-    .hint {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    .badge-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 8px;
-    }
-
-    .badge {
-      font-size: 0.72rem;
-      padding: 3px 8px;
-      border-radius: 999px;
-      border: 1px solid var(--border);
-      background: rgba(15, 23, 42, 0.9);
-      color: var(--text-muted);
-    }
-
-    .badge.good {
-      border-color: var(--success);
-      background: rgba(22, 163, 74, 0.12);
-      color: #bbf7d0;
-    }
-
-    .badge.warn {
-      border-color: var(--warning);
-      background: rgba(250, 204, 21, 0.12);
-      color: #fef9c3;
-    }
-
-    .ai-score {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 6px;
-      margin-top: 8px;
-      padding: 6px 8px;
-      border-radius: 10px;
-      background: #020617;
-      border: 1px dashed #1f2937;
-      font-size: 0.8rem;
-    }
-
-    .ai-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 999px;
-      margin-right: 6px;
-    }
-
-    .ai-dot.green { background: var(--success); }
-    .ai-dot.red   { background: var(--danger); }
-
-    .ai-label {
-      display: flex;
-      align-items: center;
-    }
-
-    .ai-score span.value {
-      font-weight: 600;
-    }
-
-    .progress-shell {
-      margin-top: 10px;
-    }
-
-    .progress-bar-bg {
-      width: 100%;
-      height: 7px;
-      border-radius: 999px;
-      background: #020617;
-      border: 1px solid #111827;
-      overflow: hidden;
-    }
-
-    .progress-bar-fill {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, var(--accent), #a855f7);
-      transition: width 0.25s ease-out;
-    }
-
-    .progress-label {
-      font-size: 0.78rem;
-      color: var(--text-muted);
-      margin-top: 4px;
-    }
-
-    .btn-row {
-      margin-top: 14px;
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    button {
-      border-radius: 999px;
-      border: none;
-      padding: 7px 14px;
-      font-size: 0.86rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: #020617;
-    }
-
-    .btn-ghost {
-      background: transparent;
-      color: var(--text-muted);
-      border: 1px solid #374151;
-    }
-
-    button:disabled {
-      opacity: 0.6;
-      cursor: default;
-    }
-
-    .status-pill {
-      margin-top: 10px;
-      font-size: 0.78rem;
-      padding: 4px 9px;
-      border-radius: 999px;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-
-    .status-pill span.dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      display: inline-block;
-    }
-
-    .status-pill.pending {
-      background: rgba(148, 163, 184, 0.15);
-      color: #e5e7eb;
-    }
-    .status-pill.pending span.dot {
-      background: var(--warning);
-    }
-
-    .status-pill.submitted {
-      background: rgba(22, 163, 74, 0.18);
-      color: #bbf7d0;
-    }
-    .status-pill.submitted span.dot {
-      background: var(--success);
-    }
-
-    .status-pill.error {
-      background: rgba(239, 68, 68, 0.15);
-      color: #fecaca;
-    }
-    .status-pill.error span.dot {
-      background: var(--danger);
-    }
-
-    .summary {
-      font-size: 0.82rem;
-      color: var(--text-muted);
-      margin-top: 6px;
-    }
-
-    @media (max-width: 800px) {
-      .grid {
-        grid-template-columns: minmax(0, 1fr);
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AI Assessment Upload Demo</title>
+    <style>
+      body {
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        background: #f9fafb;
+        color: #111827;
+        padding: 40px;
+        text-align: center;
       }
-    }
-  </style>
-</head>
-<body>
-  <div class="shell">
-    <header>
-      <div class="brand">
-        <div class="brand-logo">Av</div>
-        <div>
-          <div class="brand-text-title">Assessment Portal (Demo)</div>
-          <div class="brand-text-sub">CIPD Unit 3 – Long-form Essay</div>
-        </div>
-      </div>
-      <div class="pill">Learner: Jane Doe · Cohort: Feb&nbsp;2026</div>
-    </header>
+      .box {
+        background: #fff;
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      }
+      input[type="file"] {
+        display: none;
+      }
+      label {
+        background: #2563eb;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 6px;
+        cursor: pointer;
+      }
+      .progress {
+        width: 100%;
+        height: 10px;
+        background: #e5e7eb;
+        border-radius: 5px;
+        margin-top: 15px;
+      }
+      .bar {
+        height: 10px;
+        width: 0%;
+        background: #22c55e;
+        border-radius: 5px;
+        transition: width 1.5s ease;
+      }
+      #result {
+        margin-top: 25px;
+        display: none;
+        background: #dcfce7;
+        padding: 10px;
+        border-radius: 6px;
+        color: #166534;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <h1>AI-Assisted Assignment Upload</h1>
+      <p>Upload your Word or Excel assignment file for AI review.</p>
 
-    <h1>Submit your assignment</h1>
-    <p class="subtitle">
-      Upload your Word or Excel file. We’ll run basic checks (file type, word count, AI-usage)
-      and confirm that your submission has been received.
-    </p>
+      <label for="fileUpload">📎 Choose File</label>
+      <input type="file" id="fileUpload" accept=".doc,.docx,.xls,.xlsx,.pdf" />
 
-    <div class="grid">
-      <!-- LEFT: Upload + Checks -->
-      <section class="card">
-        <h2>1. Upload file</h2>
-
-        <div class="field-row">
-          <div class="label">Your file</div>
-          <input id="fileInput" type="file" accept=".doc,.docx,.xlsx,.xls,.pdf" />
-          <div class="hint">
-            Accepted formats: .doc, .docx, .xls, .xlsx, .pdf &nbsp;·&nbsp; Max size: 20&nbsp;MB (demo).
-          </div>
-        </div>
-
-        <div class="field-row">
-          <div class="label">Detected file name</div>
-          <input id="fileName" type="text" readonly placeholder="No file selected yet" />
-        </div>
-
-        <div class="field-row">
-          <div class="label">Estimated word count</div>
-          <input id="wordCount" type="number" readonly placeholder="–" />
-          <div class="hint">Target: 3,000 – 5,000 words.</div>
-          <div class="badge-row" id="wordBadges"></div>
-        </div>
-
-        <div class="field-row">
-          <div class="label">AI-usage check (simulated)</div>
-          <div class="ai-score" id="aiScoreBox">
-            <div class="ai-label">
-              <span class="ai-dot green" id="aiDot"></span>
-              <span id="aiLabelText">Below threshold</span>
-            </div>
-            <span class="value" id="aiValue">3%</span>
-          </div>
-          <div class="hint">
-            CIPD typically expects AI-written content to remain below an agreed threshold.
-            This is a simulated indicator for demo purposes.
-          </div>
-        </div>
-
-        <div class="btn-row">
-          <button class="btn-primary" id="submitBtn" disabled>
-            Submit assignment
-          </button>
-          <button class="btn-ghost" id="resetBtn">
-            Reset
-          </button>
-        </div>
-
-        <div id="statusPill" class="status-pill pending">
-          <span class="dot"></span>
-          <span>Waiting for upload</span>
-        </div>
-        <div id="statusSummary" class="summary">
-          Select a file to enable submission.
-        </div>
-      </section>
-
-      <!-- RIGHT: Progress + Timeline -->
-      <aside class="card">
-        <h2>2. Processing & timeline</h2>
-        <div class="label">Submission progress</div>
-        <div class="progress-shell">
-          <div class="progress-bar-bg">
-            <div class="progress-bar-fill" id="progressFill"></div>
-          </div>
-          <div class="progress-label" id="progressLabel">
-            Not started
-          </div>
-        </div>
-
-        <div class="field-row" style="margin-top:12px;">
-          <div class="label">What happens next?</div>
-          <ul style="margin: 6px 0 0 18px; padding:0; font-size:0.82rem; color:var(--text-muted);">
-            <li>File is stored securely in the assessment platform.</li>
-            <li>Automated checks: word count, basic AI-usage, file integrity.</li>
-            <li>Assignment is queued to a marker for detailed review.</li>
-            <li>Final result is pushed back to LearnUpon via API.</li>
-          </ul>
-        </div> 
-
-        <div class="field-row" style="margin-top:12px;">
-          <div class="label">Demo notes</div>
-          <p class="hint">
-            This entire page is a <strong>front-end only demo</strong>. In production, the
-            upload would hit your real assessment API and LearnUpon would be updated by the
-            platform once marking is complete.
-          </p>
-        </div>
-      </aside>
+      <div class="progress"><div class="bar" id="progressBar"></div></div>
+      <div id="result">✅ Submission received! Awaiting marking...</div>
     </div>
-  </div>
 
-  <script>
-    const fileInput = document.getElementById("fileInput");
-    const fileNameField = document.getElementById("fileName");
-    const wordCountField = document.getElementById("wordCount");
-    const wordBadges = document.getElementById("wordBadges");
-    const aiScoreBox = document.getElementById("aiScoreBox");
-    const aiValue = document.getElementById("aiValue");
-    const aiDot = document.getElementById("aiDot");
-    const aiLabelText = document.getElementById("aiLabelText");
-    const submitBtn = document.getElementById("submitBtn");
-    const resetBtn = document.getElementById("resetBtn");
-    const statusPill = document.getElementById("statusPill");
-    const statusSummary = document.getElementById("statusSummary");
-    const progressFill = document.getElementById("progressFill");
-    const progressLabel = document.getElementById("progressLabel");
+    <script>
+      const fileInput = document.getElementById('fileUpload');
+      const bar = document.getElementById('progressBar');
+      const result = document.getElementById('result');
 
-    let simulatedWordCount = null;
-    let simulatedAiScore = null;
-    let submitting = false;
-
-    function setStatus(type, text, summary) {
-      statusPill.className = "status-pill " + type;
-      statusPill.querySelector("span:nth-child(2)").textContent = text;
-      statusSummary.textContent = summary;
-    }
-
-    function setProgress(pct, label) {
-      progressFill.style.width = pct + "%";
-      progressLabel.textContent = label;
-    }
-
-    function simulateChecks() {
-      if (!fileInput.files.length) return;
-
-      const file = fileInput.files[0];
-      fileNameField.value = file.name;
-
-      // fake word count between 2800–5200
-      simulatedWordCount = Math.floor(2800 + Math.random() * 2400);
-      wordCountField.value = simulatedWordCount;
-
-      wordBadges.innerHTML = "";
-      const badge = document.createElement("span");
-      badge.classList.add("badge");
-
-      if (simulatedWordCount < 3000) {
-        badge.classList.add("warn");
-        badge.textContent = "Below suggested range";
-      } else if (simulatedWordCount > 5000) {
-        badge.classList.add("warn");
-        badge.textContent = "Above suggested range";
-      } else {
-        badge.classList.add("good");
-        badge.textContent = "Within suggested range";
-      }
-      wordBadges.appendChild(badge);
-
-      // fake AI score 0–18%
-      simulatedAiScore = (Math.random() * 18).toFixed(1);
-      aiValue.textContent = simulatedAiScore + "%";
-
-      if (simulatedAiScore > 15) {
-        aiDot.className = "ai-dot red";
-        aiLabelText.textContent = "Above expected threshold (demo)";
-      } else {
-        aiDot.className = "ai-dot green";
-        aiLabelText.textContent = "Below threshold (demo)";
-      }
-
-      submitBtn.disabled = false;
-      setStatus("pending", "Ready to submit", "Checks complete. Click “Submit assignment” to send.");
-      setProgress(10, "Waiting for submission");
-    }
-
-    fileInput.addEventListener("change", simulateChecks);
-
-    resetBtn.addEventListener("click", () => {
-      if (submitting) return;
-      fileInput.value = "";
-      fileNameField.value = "";
-      wordCountField.value = "";
-      wordBadges.innerHTML = "";
-      simulatedWordCount = null;
-      simulatedAiScore = null;
-      submitBtn.disabled = true;
-      setStatus("pending", "Waiting for upload", "Select a file to enable submission.");
-      setProgress(0, "Not started");
-    });
-
-    submitBtn.addEventListener("click", () => {
-      if (!fileInput.files.length || submitting) return;
-      submitting = true;
-      submitBtn.disabled = true;
-      setStatus("pending", "Submitting…", "File is being uploaded and queued for marking.");
-      setProgress(30, "Uploading to assessment platform…");
-
-      // Fake progress steps
-      setTimeout(() => {
-        setProgress(55, "Running automated checks (word count, AI-usage)...");
-      }, 900);
-
-      setTimeout(() => {
-        setProgress(80, "Queued to marker for review…");
-      }, 1800);
-
-      setTimeout(() => {
-        setProgress(100, "Submission received. Result will sync back to LearnUpon.");
-        setStatus(
-          "submitted",
-          "Submitted successfully",
-          "This demo would now notify LearnUpon via the Course Grade API once a mark is available."
-        );
-        submitting = false;
-
-        // OPTIONAL: send a message to the parent LMS that submission is done
-        if (window.parent && window.parent !== window) {
-          window.parent.postMessage("assessment:completed", "*");
-        }
-      }, 2800);
-    });
-  </script>
-</body>
+      fileInput.addEventListener('change', () => {
+        bar.style.width = '0%';
+        result.style.display = 'none';
+        setTimeout(() => (bar.style.width = '80%'), 200);
+        setTimeout(() => (bar.style.width = '100%'), 2000);
+        setTimeout(() => (result.style.display = 'block'), 2500);
+      });
+    </script>
+  </body>
 </html>
